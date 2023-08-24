@@ -35,9 +35,7 @@ namespace VehicleTransponder.Services
 
         public void OnVehicleCreated(object sender, VehicleEventArgs vehicleEventArgs)
         {
-            var transponder = Create(vehicleEventArgs.Vehicle);
-            ITransponderRepository transponderRepository = GetRepository(vehicleEventArgs.Vehicle);
-            transponderRepository.Save(transponder);
+            Create(vehicleEventArgs.Vehicle);
         }
 
         private ITransponderRepository GetRepository(Vehicle vehicle)

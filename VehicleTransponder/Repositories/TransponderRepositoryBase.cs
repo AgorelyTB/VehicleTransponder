@@ -15,9 +15,6 @@ namespace VehicleTransponder.Repositories
             };
         }
 
-        public virtual void Save(Transponder transponder)
-        {
-            // dummy method for saving the transponder. could be a database request
-        }
+   
     }
 }

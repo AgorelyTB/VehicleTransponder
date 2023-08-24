@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 using VehicleTransponder.Contracts;
 using VehicleTransponder.Repositories;
 using VehicleTransponder.Services;
@@ -46,25 +47,51 @@ namespace VehicleTransponder.Controllers
 
         public VehicleAPIController(IVehicleService vehicleService, ITransponderService transponderService, ILogger<VehicleAPIController> logger)
         {
+            if (logger == null)
+            {
+                throw new ArgumentNullException(nameof(logger));
+            }
+
             _vehicleService = vehicleService;
             _transponderService = transponderService;
             _logger = logger;
-
-            InitializeServices();
+            try
+            {
+                InitializeServices();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+                throw e;
+            }
         }
 
         // POST api/<VehicleAPIController>
         [HttpPost]
         public void Create([FromBody] VehicleDto vehicle)
         {
-            var vehicleToSave = new Vehicle()
+            try
             {
-                Make = vehicle.Make,
-                Model = vehicle.Model,
-                Year = vehicle.Year
-            };
+                if (vehicle == null)
+                {
+                    throw new ArgumentNullException(nameof(vehicle));
+                }
+                var vehicleToSave = new Vehicle()
+                {
+                    Make = vehicle.Make,
+                    Model = vehicle.Model,
+                    Year = vehicle.Year
+                };
 
-            this.VehicleService.Create(vehicleToSave);
+                var createdVehicle = this.VehicleService.Create(vehicleToSave);
+                _logger.LogInformation($"Vehicle created. \nId: {createdVehicle.Id} \nMake: {createdVehicle.Make} \nModel: {createdVehicle.Model} \nYear: {createdVehicle.Year}");
+
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+                throw e;
+            }
         }
 
         private void InitializeServices()

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 using VehicleTransponder.Contracts;
 using VehicleTransponder.Repositories;
 using VehicleTransponder.Services;
@@ -68,7 +69,7 @@ namespace VehicleTransponder.Controllers
 
         // POST api/<VehicleAPIController>
         [HttpPost]
-        public void Create([FromBody] VehicleDto vehicle)
+        public IActionResult Create([FromBody] VehicleDto vehicle)
         {
             try
             {
@@ -85,7 +86,17 @@ namespace VehicleTransponder.Controllers
 
                 var createdVehicle = this.VehicleService.Create(vehicleToSave);
                 _logger.LogInformation($"Vehicle created. \nId: {createdVehicle.Id} \nMake: {createdVehicle.Make} \nModel: {createdVehicle.Model} \nYear: {createdVehicle.Year}");
-
+                return Ok( createdVehicle );
+            }
+            catch (ArgumentException argEx)
+            {
+                _logger.LogError(argEx.Message);
+                return BadRequest(argEx.Message);
+            }
+            catch (InvalidOperationException invalidOpEx)
+            {
+                _logger.LogError(invalidOpEx.Message);
+                return BadRequest(invalidOpEx.Message);
             }
             catch (Exception e)
             {

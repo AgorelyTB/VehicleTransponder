@@ -2,6 +2,7 @@ using Moq;
 using VehicleTransponder.Contracts;
 using VehicleTransponder.Repositories;
 using VehicleTransponder.Services;
+using VehicleTransponder.UnitTests.TestClasses;
 
 namespace VehicleTransponder.UnitTests
 {
@@ -39,7 +40,8 @@ namespace VehicleTransponder.UnitTests
             var vehicleRepositoryMock = new Mock<IVehicleRepository>();
             var transponderRepositoryFactoryMock = new Mock<ITransponderRepositoryFactory>();
             var transponderRepositoryMock = new Mock<ITransponderRepository>();
-            
+            var testLogger = new TestLogger<TransponderService>();
+
             var createdVehicle = new Vehicle()
             {
                 Make = "Honda",
@@ -60,7 +62,7 @@ namespace VehicleTransponder.UnitTests
             transponderRepositoryFactoryMock.Setup(f => f.GetTransponderRepository(It.IsAny<int>())).Returns(transponderRepositoryMock.Object);
 
             IVehicleService vehicleService = new VehicleService(vehicleRepositoryMock.Object);
-            ITransponderService transponderService = new TransponderService(transponderRepositoryFactoryMock.Object);
+            ITransponderService transponderService = new TransponderService(transponderRepositoryFactoryMock.Object, testLogger);
             vehicleService.VehicleCreated += transponderService.OnVehicleCreated;
 
             vehicleService.Create(createdVehicle);

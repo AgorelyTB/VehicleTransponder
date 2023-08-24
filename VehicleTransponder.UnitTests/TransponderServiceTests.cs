@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using VehicleTransponder.Contracts;
 using VehicleTransponder.Repositories;
 using VehicleTransponder.Services;
+using VehicleTransponder.UnitTests.TestClasses;
 
 namespace VehicleTransponder.UnitTests
 {
@@ -17,6 +18,7 @@ namespace VehicleTransponder.UnitTests
         [TestMethod]
         public void CreateTransponderUsingClassicRepository()
         {
+            var testLogger = new TestLogger<TransponderService>();
             var vehicle = new Vehicle()
             {
                 Id = 99,
@@ -28,7 +30,7 @@ namespace VehicleTransponder.UnitTests
             var factoryMock = new Mock<ITransponderRepositoryFactory>();
             factoryMock.Setup(m => m.GetTransponderRepository(It.IsAny<int>())).Returns(new ClassicTransponderRepository()).Verifiable();
 
-            ITransponderService service = new TransponderService(factoryMock.Object);
+            ITransponderService service = new TransponderService(factoryMock.Object, testLogger);
             Transponder transponder = service.Create(vehicle);
             factoryMock.Verify(m => m.GetTransponderRepository(It.IsAny<int>()));
             Assert.IsTrue(transponder.VehicleId ==  vehicle.Id);
@@ -38,6 +40,7 @@ namespace VehicleTransponder.UnitTests
         [TestMethod]
         public void CreateTransponderUsingModernRepository()
         {
+            var testLogger = new TestLogger<TransponderService>();
             var vehicle = new Vehicle()
             {
                 Id = 99,
@@ -49,7 +52,7 @@ namespace VehicleTransponder.UnitTests
             var factoryMock = new Mock<ITransponderRepositoryFactory>();
             factoryMock.Setup(m => m.GetTransponderRepository(It.IsAny<int>())).Returns(new ModernTransponderRepository()).Verifiable();
 
-            ITransponderService service = new TransponderService(factoryMock.Object);
+            ITransponderService service = new TransponderService(factoryMock.Object, testLogger);
             Transponder transponder = service.Create(vehicle);
             factoryMock.Verify(m => m.GetTransponderRepository(It.IsAny<int>()));
             Assert.IsTrue(transponder.VehicleId == vehicle.Id);

@@ -7,6 +7,7 @@ namespace VehicleTransponder.Services
     public class TransponderService : ITransponderService
     {
         private ITransponderRepositoryFactory _repositoryFactory;
+        private ILogger<TransponderService> _logger;
 
         private ITransponderRepositoryFactory TransponderRepositoryFactory
         {
@@ -22,8 +23,9 @@ namespace VehicleTransponder.Services
             }
         }
 
-        public TransponderService(ITransponderRepositoryFactory transponderRepositoryFactory) 
+        public TransponderService(ITransponderRepositoryFactory transponderRepositoryFactory, ILogger<TransponderService> logger) 
         { 
+            _logger = logger;
             _repositoryFactory = transponderRepositoryFactory;
         }
 
@@ -35,7 +37,8 @@ namespace VehicleTransponder.Services
 
         public void OnVehicleCreated(object sender, VehicleEventArgs vehicleEventArgs)
         {
-            Create(vehicleEventArgs.Vehicle);
+            var transponder = Create(vehicleEventArgs.Vehicle);
+            _logger.LogInformation($"Transponder created with vehicleId {transponder.VehicleId}");
         }
 
         private ITransponderRepository GetRepository(Vehicle vehicle)
